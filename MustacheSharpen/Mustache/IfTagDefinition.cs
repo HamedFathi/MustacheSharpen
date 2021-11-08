@@ -1,0 +1,16 @@
+﻿// ReSharper disable All 
+namespace MustacheSharpen
+{
+    internal sealed class IfTagDefinition : ConditionTagDefinition
+    {
+        public IfTagDefinition()
+            : base("if")
+        {
+        }
+
+        protected override bool GetIsContextSensitive()
+        {
+            return false;
+        }
+    }
+}
