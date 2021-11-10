@@ -1,5 +1,17 @@
 ![mustache](https://user-images.githubusercontent.com/8418700/140830241-73a158ba-8505-4da0-bf0a-d88702c4c9cf.png)
 
+This library is a .NET standard version of [mustache-sharp](https://github.com/jehugaleahsa/mustache-sharp) with some enhancements and new features.
+
+## [Nuget](https://www.nuget.org/packages/MustacheSharpen)
+
+```
+Install-Package MustacheSharpen
+
+dotnet add package MustacheSharpen
+```
+
+<hr/>
+
 ## Overview
 Generating text has always been a chore. Either you're concatenating strings like a mad man or you're getting fancy with `StringBuilder`. Either way, the logic for conditionally including values or looping over a collection really obscures the intention of the code. A more declarative approach would improve your code big time. Hey, that's why server-side scripting got popular in the first place, right?
 
