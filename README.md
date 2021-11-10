@@ -9,26 +9,28 @@ Generating text has always been a chore. Either you're concatenating strings lik
 
 Introducing [handlebars.js](http://handlebarsjs.com/)... If you've needed to generate any HTML templates, **handlebars.js** is a really awesome tool. Not only does it support an `if` and `each` tag, it lets you define your own tags! It also makes it easy to reference nested values `{{Customer.Address.ZipCode}}`.
 
-**mustache#** brings the power of **handlebars.js** to .NET and then takes it a little bit further. It is geared towards building ordinary text documents, rather than just HTML. It differs from **handlebars.js** in the way it handles newlines. With **mustache#**, you explicitly indicate when you want newlines - actual newlines are ignored.
+`MustacheSharpen` brings the power of **handlebars.js** to .NET and then takes it a little bit further. It is geared towards building ordinary text documents, rather than just HTML. It differs from **handlebars.js** in the way it handles newlines. With `MustacheSharpen`, you explicitly indicate when you want newlines - actual newlines are ignored.
 
-    Hello, {{Customer.Name}}
+```
+Hello, {{Customer.Name}}
+{{#newline}}
+{{#newline}}
+{{#with Order}}
+{{#if LineItems}}
+Here is a summary of your previous order:
+{{#newline}}
+{{#newline}}
+{{#each LineItems}}
+    {{ProductName}}: {{UnitPrice:C}} x {{Quantity}}
     {{#newline}}
-    {{#newline}}
-    {{#with Order}}
-    {{#if LineItems}}
-    Here is a summary of your previous order:
-    {{#newline}}
-    {{#newline}}
-    {{#each LineItems}}
-        {{ProductName}}: {{UnitPrice:C}} x {{Quantity}}
-        {{#newline}}
-    {{/each}}
-    {{#newline}}
-    Your total was {{Total:C}}.
-    {{#else}}
-    You do not have any recent purchases.
-    {{/if}}
-    {{/with}}
+{{/each}}
+{{#newline}}
+Your total was {{Total:C}}.
+{{#else}}
+You do not have any recent purchases.
+{{/if}}
+{{/with}}    
+```    
     
 Most of the lines in the previous example will never appear in the final output. This allows you to use **mustache#** to write templates for normal text, not just HTML/XML.
 
@@ -38,28 +40,34 @@ The placeholders can be any valid identifier. These map to the property names in
 ### Formatting Placeholders
 Each format item takes the following form and consists of the following components:
 
-    {{identifier[,alignment][:formatString]}}
+```
+{{identifier[,alignment][:formatString]}}
+```
 
 The matching braces are required. Notice that they are double curly braces! The alignment and the format strings are optional and match the syntax accepted by `String.Format`. Refer to [String.Format](http://msdn.microsoft.com/en-us/library/system.string.format.aspx)'s documentation to learn more about the standard and custom format strings.
 
 ### Placeholder Scope
 The identifier is used to find a property with a matching name. If you want to print out the object itself, you can use the special identifier `this`.
 
-    FormatCompiler compiler = new FormatCompiler();
-    Generator generator = compiler.Compile("Hello, {{this}}!!!");
-    string result = generator.Render("Bob");
-    Console.Out.WriteLine(result);  // Hello, Bob!!!
-    
+```cs
+FormatCompiler compiler = new FormatCompiler();
+Generator generator = compiler.Compile("Hello, {{this}}!!!");
+string result = generator.Render("Bob");
+Console.Out.WriteLine(result);  // Hello, Bob!!!
+```
+
 Some tags, such as `each` and `with`, change which object the values will be retrieved from.
 
 If a property with the placeholder name can't be found at the current scope, the name will be searched for at the next highest level.
 
-**mustache#** will automatically detect when an object is a dictionary and search for a matching key. In this case, it still needs to be a valid identifier name.
+`MustacheSharpen` will automatically detect when an object is a dictionary and search for a matching key. In this case, it still needs to be a valid identifier name.
 
 ### Nested Placeholders
 If you want to grab a nested property, you can separate identifiers using `.`.
 
-    {{Customer.Address.ZipCode}}
+```
+{{Customer.Address.ZipCode}}
+```
 
 ## The 'if' tag
 The **if** tag allows you to conditionally include a block of text.
@@ -80,19 +88,23 @@ The **if** tag has complimentary **elif** and **else** tags. There can be as man
 ## The 'each' tag
 If you need to print out a block of text for each item in a collection, use the **each** tag.
 
-    {{#each Customers}}
-    Hello, {{Name}}!!
-    {{/each}}
+```
+{{#each Customers}}
+Hello, {{Name}}!!
+{{/each}}
+```
     
 Within the context of the **each** block, the scope changes to the current item. So, in the example above, `Name` would refer to a property in the `Customer` class.
 
 Additionally, you can access the current index into the collection being enumerated using the **index** tag.
 
-    <ul>
-    {{#each Items}}
-        <li class="list-item{{#index}}" value="{{Value}}">{{Description}}</li>
-    {{/each}}
-    </ul>
+```
+<ul>
+{{#each Items}}
+    <li class="list-item{{#index}}" value="{{Value}}">{{Description}}</li>
+{{/each}}
+</ul>
+```
     
 This will build an HTML list, building a list of items with `Description` and `Value` properties. Additionally, the `index` tag is used to create a CSS class with increasing numbers.
     
@@ -123,14 +135,14 @@ The following example will print out "EvenOddEvenOdd" by toggling a variable cal
 ```cs
 FormatCompiler compiler = new FormatCompiler();
 const string format = @"{{#set even}}
-{{#each this}}
-{{#if @even}}
-Even
-{{#else}}
-Odd
-{{/if}}
-{{#set even}}
-{{/each}}";
+    {{#each this}}
+    {{#if @even}}
+    Even
+    {{#else}}
+    Odd
+    {{/if}}
+    {{#set even}}
+    {{/each}}";
 Generator generator = compiler.Compile(format);
 generator.ValueRequested += (sender, e) =>
 {
